@@ -2,17 +2,20 @@
 // Created by lucas on 9/22/19.
 //
 
+#include <string>
+#include <vector>
+#include <unordered_map>
 #ifndef CTC_34_LAB_AUTOMATA_H
 #define CTC_34_LAB_AUTOMATA_H
 
 class Automata {
 public:
-    Automata();
-    void createFromFile();
-    std::vector & getNextSates();
+    explicit Automata(int size);
+    void createFromFile(std::string path);
+    std::vector<int> * getNextSates(int node, char letter);
 
 private:
-    std::unordered_map<char, std::vector<int>> states;
+    std::vector<std::unordered_map<char, std::vector<int>>> states;
 };
 
 #endif //CTC_34_LAB_AUTOMATA_H
