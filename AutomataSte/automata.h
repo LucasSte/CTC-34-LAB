@@ -9,9 +9,15 @@ public:
     explicit Automata(int size);
     void createFromFile(std::string path);
     std::vector<int> * getNextSates(int node, char letter);
+    int getSize();
 
 private:
-    std::vector<std::unordered_map<char, std::vector<int>>> states;
+    struct nodes{
+        std::unordered_map<char, std::vector<int>> keys;
+        bool final;
+    };
+    std::vector<nodes> states;
+    int size;
 
 };
 

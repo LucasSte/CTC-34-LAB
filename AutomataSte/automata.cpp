@@ -8,6 +8,7 @@
 
 Automata::Automata(int size) {
     states.resize(size);
+    this->size = size;
 }
 
 
@@ -23,7 +24,9 @@ void Automata::createFromFile(std::string path) {
             char letter = line[2];
             int next = line[4] - '0';
 
-            states[node][letter].emplace_back(next);
+            states[node].keys[letter].emplace_back(next);
+
+            states[node].final = (line[6] == 'f');
         }
     }
     else
@@ -36,13 +39,13 @@ std::vector<int> * Automata::getNextSates(int node, char letter) {
     int length = states.size();
     if(node < length)
     {
-        if(states[node].find(letter) == states[node].end())
+        if(states[node].keys.find(letter) == states[node].keys.end())
         {
             return nullptr;
         }
         else
         {
-            return &states[node][letter];
+            return &states[node].keys[letter];
         }
     }
     else
@@ -50,4 +53,8 @@ std::vector<int> * Automata::getNextSates(int node, char letter) {
         return nullptr;
     }
 
+}
+
+int Automata::getSize() {
+    return size;
 }

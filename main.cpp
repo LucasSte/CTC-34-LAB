@@ -1,10 +1,16 @@
 #include <iostream>
-#include "Automata/automata.h"
+#include "AutomataSte/automata.h"
+#include "AutomataSte/automata.cpp"
+#include <vector>
 
 int main() {
 
-    string reg_expr = "ab+(b+c)*";
-    Automata my_automata(reg_expr);
+    Automata automato(6);
+    automato.createFromFile("../teste.txt");
+
+    std::vector<int> * nodes;
+    nodes = automato.getNextSates(1, '.');
+    //std::cout << (*nodes)[0] << std::endl;
 
     return 0;
 }
