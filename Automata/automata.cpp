@@ -1,6 +1,7 @@
 #include "automata.h"
 #include <stack>
 #include <forward_list>
+#include <locale>
 
 Edge::Edge(int index1, int index2, string reg_exprsn) {
     node1 = index1;
@@ -42,32 +43,35 @@ int Graph::new_node(bool is_final) { //retorna o indice do nó
 Operation Automata::expr_splitter(string orig_expr) {
     string reg_expr1, reg_expr2;
     char lang_operator;
-    int num_open_parentheses = 0,
-        last_open_parentheses = -1; // posição do ultimo parentese aberto. -1 indica que nenhum parentese foi aberto
-    vector<int> open_parentheses;
+    int num_open_parentheses = 0;
 
     for (int i = 0; i < orig_expr.size(); ++i) {
         if(num_open_parentheses == 0){
-            if(orig_expr[i] == '+'){
+            if(orig_expr[i] == '+'){ // União
                 reg_expr1 = string(orig_expr.begin(), orig_expr.begin()+i);
                 reg_expr2 = string(orig_expr.begin()+i+1, orig_expr.end());
                 lang_operator = '+';
             }
-            if(orig_expr[i] == '*'){ // a operação com parenteses na verdade é desnecessário, precisamos analisar as cat antes  
-                if(orig_expr[i-1] != ')'){
-                    reg_expr1 = string(1, orig_expr[i-1]);
-                }
-                else{
-                    reg_expr1 = string(orig_expr.begin()+last_open_parentheses+1, orig_expr.begin()+i);
-                }
+            if(orig_expr[i] == '(' || isalpha(orig_expr[i])){ // Concatenação
+                reg_expr1 = string(orig_expr.begin(), orig_expr.begin()+i);
+                reg_expr2 = string(orig_expr.begin()+i, orig_expr.end());
+                lang_operator = 'c';
+            }
+            if(orig_expr[i] == '*'){  // Feixo de Kleene
+                // se chegou até aqui, não há união nem cat, logo os parenteses pegam do início ao fim
+                reg_expr1 = string(orig_expr.begin()+1, orig_expr.end()-2); // tudo menos o parenteses e o '*'
                 lang_operator = '*';
+            }
+            else {//error
+                lang_operator = 'x';
             }
         }
 
         if(orig_expr[i]=='('){
             num_open_parentheses++;
-            open_parentheses.push_back(i);
-            last_open_parentheses = i;
+        }
+        else if(orig_expr[i]==')'){
+            num_open_parentheses--;
         }
 
     }
