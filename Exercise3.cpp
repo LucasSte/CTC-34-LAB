@@ -8,52 +8,85 @@
 #include "AutomataSte/automata.cpp"
 #include "AutomataSte/automata.h"
 
+void findEpsilonTrasitions(int insertion_node, int verification_node, Automata & automato, std::vector<std::unordered_set<int>> & eclosure)
+{
+    std::vector<int> * nextNodes;
+    nextNodes = automato.getNextSates(verification_node, '.');
+    if(nextNodes != nullptr)
+    {
+        for(int & j : (*nextNodes))
+        {
+            if(insertion_node != j) {
+                eclosure[insertion_node].insert(j);
+                findEpsilonTrasitions(insertion_node, j, automato, eclosure);
+            }
+        }
+    }
+
+}
+
+
 void findEClosure(Automata & automato, std::vector<std::unordered_set<int>> & eclosure)
 {
     int lenght = automato.getSize();
-    std::vector<int> * nextNodes;
     for(int i=0; i<lenght; i++)
     {
-        nextNodes = automato.getNextSates(i, '.');
-        if(nextNodes != nullptr)
-        {
-            for(int & j : (*nextNodes))
-            {
-                eclosure[i].insert(j);
-            }
-        }
+        findEpsilonTrasitions(i, i, automato, eclosure);
     }
 }
 
 
 int main()
 {
-    int n = 5;
     std::string path = "../teste.txt";
 
-    Automata automato(n);
+    Automata automato;
     automato.createFromFile(path);
+    int n = automato.getSize();
 
     std::vector<std::unordered_set<int>> eclosure;
     eclosure.resize(n);
 
+
+    eclosure.clear();
     findEClosure(automato, eclosure);
 
     for(int i=0; i<n; i++)
     {
-        std::cout << "E-closure: " << i << std::endl;
-        if(eclosure[i].empty())
-        {
-            std::cout << " Empty" << std::endl;
-        }
-        else
+        if(!eclosure[i].empty())
         {
             for(auto itr = eclosure[i].begin(); itr != eclosure[i].end(); itr++)
             {
-                std::cout << " " << (*itr) << std::endl;
+                auto reverses = automato.getReverses(i);
+                for(auto itr2 = reverses.begin(); itr2 != reverses.end(); itr2++)
+                {
+                    for(int & depart : (itr2->second))
+                    {
+
+                        automato.addTransition(depart, itr2->first, (*itr), false);
+                    }
+                }
+
+                auto keys = automato.getKeys(*itr);
+                for(auto itr2 = keys.begin(); itr2 != keys.end(); itr2++)
+                {
+                    for(int & nextNode : (itr2->second))
+                    {
+                        automato.addTransition(i, itr2->first, nextNode, false);
+                    }
+                }
+                if(automato.isFinal(*itr))
+                {
+                    automato.setFinal(i);
+                }
+                automato.removeEpsilonTransitions(i);
+
             }
+
         }
     }
+
+    automato.printAutomata();
 
 
     return 0;

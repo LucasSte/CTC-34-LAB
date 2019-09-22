@@ -5,7 +5,7 @@
 
 int main() {
 
-    Automata automato(6);
+    Automata automato;
     automato.createFromFile("../teste.txt");
 
     std::vector<int> * nodes;
