@@ -44,7 +44,7 @@ Operation Automata::expr_splitter(string orig_expr) {
     char lang_operator;
     int num_open_parentheses = 0;
     bool there_is_union = false,
-         there_is_cat = false;
+            there_is_cat = false;
 
     for (int i = 0; i < orig_expr.size() && !there_is_union; ++i) {
         if(num_open_parentheses == 0 && i!=0){

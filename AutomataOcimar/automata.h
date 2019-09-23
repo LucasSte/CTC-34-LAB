@@ -31,7 +31,7 @@ public:
     int size;// numero de nó's
     Graph();
     bool add_edge(int index1, int index2, string reg_expr); // retorna se conseguiu incerir a aresta (não consegue
-                                                            // incerir se um dos indices não se refere a um existente)
+    // incerir se um dos indices não se refere a um existente)
     bool is_final_node(int node_index);
     int new_node(bool is_final); //retorna o indice do nó
 };
@@ -43,7 +43,7 @@ private:
 public:
     Automata(string reg_expr);
     Operation expr_splitter(string reg_expr); // retorna uma ou duas expressoes regulares e
-                                              // a operação que ocorre com/entre elas
+    // a operação que ocorre com/entre elas
     void show_graph();
 
 };
