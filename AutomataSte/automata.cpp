@@ -1,6 +1,7 @@
 //
 // Created by lucas on 9/22/19.
 //
+
 #include "automata.h"
 #include <string>
 #include <fstream>
