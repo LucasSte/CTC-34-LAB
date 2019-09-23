@@ -28,7 +28,7 @@ private:
     vector<bool> final_node;
 public:
     list<Edge> edge_list;
-    int size;// numero de nó's
+    int num_nodes;// numero de nó's
     Graph();
     bool add_edge(int index1, int index2, string reg_expr); // retorna se conseguiu incerir a aresta (não consegue
     // incerir se um dos indices não se refere a um existente)
@@ -38,7 +38,6 @@ public:
 
 class Automata{
 private:
-    int size;
     Graph automata_graph = Graph();
 public:
     Automata(string reg_expr);

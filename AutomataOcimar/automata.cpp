@@ -15,11 +15,11 @@ Operation::Operation(string reg_exprsn1, string reg_exprsn2, char language_opera
 }
 
 Graph::Graph() {
-    size = 0;
+    num_nodes = 0;
 }
 
 bool Graph::add_edge(int index1, int index2, string reg_expr){
-    if(index1< size && index2 < size){
+    if(index1< num_nodes && index2 < num_nodes){
         Edge aux(index1, index2, reg_expr);
         edge_list.push_front(aux);
         return true;
@@ -35,8 +35,8 @@ bool Graph::is_final_node(int node_index){
 
 int Graph::new_node(bool is_final) { //retorna o indice do nó
     final_node.push_back(is_final);
-    size++;
-    return size-1;
+    num_nodes++;
+    return num_nodes-1;
 }
 
 Operation Automata::expr_splitter(string orig_expr) {
@@ -96,7 +96,6 @@ Operation Automata::expr_splitter(string orig_expr) {
 
 Automata::Automata(string reg_expr) {
     // Construtor
-    size = 2;
 
     automata_graph.new_node(false);//nó inicial (nó de num 0)
     automata_graph.new_node(true);//nó final (nó de num 1)
@@ -158,7 +157,12 @@ Automata::Automata(string reg_expr) {
 void Automata::show_graph() {
     cout<<"digraph {"<<endl;
     for (auto edge : automata_graph.edge_list) {
-        cout<<"\t"<<edge.node1<<" -> "<<edge.node2<<"[label=\""<<edge.reg_expr<<"\"]"<<endl;
+        cout<<"\t"<<edge.node1<<" -> "<<edge.node2<<" [label=\""<<edge.reg_expr<<"\"]"<<endl;
+    }
+    for(int i = 0; i< automata_graph.num_nodes; i++){
+        if(automata_graph.is_final_node(i)){
+            cout<<"\t"<<i<<" [peripheries=2]"<<endl;
+        }
     }
     cout<<"}"<<endl;
 }
