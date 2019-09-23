@@ -28,6 +28,19 @@ void Automata::createFromFile(std::string path) {
 
     if(file.is_open())
     {
+        getline(file, line);
+        std::vector<std::string> result1;
+        std::istringstream iss1(line);
+        for(std::string s; iss1 >> s;)
+        {
+            result1.emplace_back(s);
+        }
+        for(std::string & state : result1)
+        {
+            int state_int = std::stoi(state);
+            states[state_int].final = true;
+        }
+
         while(getline(file, line))
         {
             std::vector<std::string> result;
@@ -43,9 +56,9 @@ void Automata::createFromFile(std::string path) {
             states[node].keys[letters].push_back(next);
             states[next].reverse[letters].push_back(node);
 
-            states[node].final = (line[6] == 'f');
-            states[node].forget = false;
+
         }
+
     }
     else
     {
@@ -96,10 +109,20 @@ void Automata::printAutomata() {
         {
             for(int & j : (itr->second))
             {
-                std::cout << i << " " << itr->first << " " << j << (states[i].final?" f":" n") << std::endl;
+                std::cout << i << " " << itr->first << " " << j << std::endl;
             }
         }
     }
+
+    std::cout << "Final states" << std::endl;
+    for(int i=0; i<size; i++)
+    {
+        if(states[i].final)
+        {
+            std::cout << i << " ";
+        }
+    }
+    std::cout << std::endl;
 }
 
 std::unordered_map<std::string, std::list<int>> & Automata::getKeys(int node) {
@@ -396,11 +419,14 @@ void Automata::getRegularExpression(std::string & answer) {
     }
     else
     {
+        std::string regex_ante = "None";
         for(nodes & node : states)
         {
             for(auto itr = node.keys.begin(); itr != node.keys.end(); itr++)
             {
-                regex << itr->first;
+                if(itr->first != regex_ante)
+                    regex << itr->first;
+                regex_ante = itr->first;
             }
         }
         answer = regex.str();

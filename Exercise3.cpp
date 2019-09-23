@@ -38,7 +38,7 @@ void findEClosure(Automata & automato, std::vector<std::unordered_set<int>> & ec
 
 int main()
 {
-    std::string path = "../teste.txt";
+    std::string path = "../exemplo4m.txt";
 
     Automata automato;
     automato.createFromFile(path);
@@ -47,9 +47,18 @@ int main()
     std::vector<std::unordered_set<int>> eclosure;
     eclosure.resize(n);
 
-
     eclosure.clear();
+
     findEClosure(automato, eclosure);
+
+//    for(int i=0; i<n; i++)
+//    {
+//        std::cout << "Estado " << i << std::endl;
+//        for(auto itr = eclosure[i].begin(); itr != eclosure[i].end(); itr++)
+//        {
+//            std::cout << *itr << std::endl;
+//        }
+//    }
 
     for(int i=0; i<n; i++)
     {
@@ -63,7 +72,7 @@ int main()
                     for(int & depart : (itr2->second))
                     {
 
-                        automato.addTransition(depart, itr2->first, (*itr), false);
+                        automato.addTransition(depart, itr2->first, (*itr), automato.isFinal(depart));
                     }
                 }
 
@@ -72,7 +81,7 @@ int main()
                 {
                     for(int & nextNode : (itr2->second))
                     {
-                        automato.addTransition(i, itr2->first, nextNode, false);
+                        automato.addTransition(i, itr2->first, nextNode, automato.isFinal(i));
                     }
                 }
                 if(automato.isFinal(*itr))

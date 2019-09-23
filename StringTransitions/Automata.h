@@ -35,7 +35,6 @@ private:
         std::unordered_map<std::string, std::list<int>> keys;
         std::unordered_map<std::string, std::list<int>> reverse;
         bool final;
-        bool forget;
     };
     std::vector<nodes> states;
     int size;
