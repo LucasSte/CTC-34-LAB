@@ -156,7 +156,9 @@ Automata::Automata(string reg_expr) {
 }
 
 void Automata::show_graph() {
+    cout<<"digraph {"<<endl;
     for (auto edge : automata_graph.edge_list) {
-        cout<<"("<<edge.node1<<")--- "<<edge.reg_expr<<" ---("<<edge.node2<<")"<<endl;
+        cout<<"\t"<<edge.node1<<" -> "<<edge.node2<<"[label=\""<<edge.reg_expr<<"\"]"<<endl;
     }
+    cout<<"}"<<endl;
 }
