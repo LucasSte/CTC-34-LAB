@@ -29,6 +29,7 @@ public:
     void concatenateEdges();
     void removeState(int node);
     void getRegularExpression(std::string & answer);
+    void printAsGraphViz();
 
 private:
     struct nodes{
@@ -38,7 +39,6 @@ private:
     };
     std::vector<nodes> states;
     int size;
-
 
 };
 

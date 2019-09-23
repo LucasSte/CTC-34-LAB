@@ -60,6 +60,13 @@ int main()
 //        }
 //    }
 
+    struct toAdd{
+        int depart;
+        int arrive;
+        std::string key;
+    };
+
+    std::vector<toAdd> transitionstoAdd;
     for(int i=0; i<n; i++)
     {
         if(!eclosure[i].empty())
@@ -71,8 +78,13 @@ int main()
                 {
                     for(int & depart : (itr2->second))
                     {
+                        if(itr2->first != ".")
+                        {
+                            //std::cout << "Adding " << depart << " " << itr2->first << " " << *itr << std::endl;
+                            //automato.addTransition(depart, itr2->first, (*itr), automato.isFinal(depart));
+                            transitionstoAdd.push_back({depart, *itr, itr2->first});
+                        }
 
-                        automato.addTransition(depart, itr2->first, (*itr), automato.isFinal(depart));
                     }
                 }
 
@@ -81,7 +93,11 @@ int main()
                 {
                     for(int & nextNode : (itr2->second))
                     {
-                        automato.addTransition(i, itr2->first, nextNode, automato.isFinal(i));
+                        if(itr2->first != ".") {
+                            //std::cout << "Addingi " << i << " " << itr2->first << " " << nextNode << std::endl;
+                            //automato.addTransition(i, itr2->first, nextNode, automato.isFinal(i));
+                            transitionstoAdd.push_back({i, nextNode, itr2->first});
+                        }
                     }
                 }
                 if(automato.isFinal(*itr))
@@ -91,11 +107,17 @@ int main()
                 automato.removeEpsilonTransitions(i);
 
             }
+            //automato.printAutomata();
 
         }
     }
 
-    automato.printAutomata();
+    for(toAdd & transitions : transitionstoAdd)
+    {
+        automato.addTransition(transitions.depart, transitions.key, transitions.arrive, automato.isFinal(transitions.depart));
+    }
+
+    automato.printAsGraphViz();
 
 
     return 0;

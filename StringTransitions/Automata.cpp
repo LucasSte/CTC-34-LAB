@@ -253,7 +253,6 @@ void Automata::concatenateEdges() {
                 }
             }
             Automata::addTransition(i, newTransition.str(), j, states[i].final);
-            //states[i].keys[newTransition.str()].push_back(j);
         }
         transitions.clear();
         repeatedTransitions.clear();
@@ -294,7 +293,6 @@ void Automata::removeState(int node) {
             for (int &i : (itr->second)) {
                 for (auto itr2 = states[node].keys.begin(); itr2 != states[node].keys.end(); itr2++) {
                     for (int &j : (itr2->second)) {
-                        std::pair<int, int> transition(i, j);
                         if(i!= node && j!= node) {
                             if (hasLoopExpression) {
                                 if (itr->first == "." && itr2->first == ".") {
@@ -418,4 +416,31 @@ void Automata::getRegularExpression(std::string & answer) {
         }
         answer = regex.str();
     }
+}
+
+void Automata::printAsGraphViz() {
+    std::cout << "digraph fsm {" << std::endl;
+    std::cout << "node [shape = doublecircle];";
+
+    for(int i=0; i<size; i++)
+    {
+        if(states[i].final)
+            std::cout << " " << i;
+    }
+    std::cout << ";" << std::endl;
+    std::cout << "node [shape = circle];" << std::endl;
+
+    for(int i=0; i< size; i++)
+    {
+        for(auto itr = states[i].keys.begin(); itr != states[i].keys.end(); itr++)
+        {
+            for(int & j : (itr->second))
+            {
+                std::cout << i << " -> " << j  << " [ label = \""<< itr->first << "\" ];" <<  std::endl;
+            }
+        }
+    }
+
+    std::cout << "}" << std::endl;
+
 }
