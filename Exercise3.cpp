@@ -8,6 +8,8 @@
 #include "StringTransitions/Automata.cpp"
 #include "StringTransitions/Automata.h"
 
+
+//Funcao recursiva para encontrar e-fecho
 void findEpsilonTrasitions(int insertion_node, int verification_node, Automata & automato, std::vector<std::unordered_set<int>> & eclosure)
 {
     std::list<int> * nextNodes;
@@ -25,7 +27,7 @@ void findEpsilonTrasitions(int insertion_node, int verification_node, Automata &
 
 }
 
-
+//Funcao auxiliar para encontrar e-fecho
 void findEClosure(Automata & automato, std::vector<std::unordered_set<int>> & eclosure)
 {
     int lenght = automato.getSize();
@@ -38,8 +40,10 @@ void findEClosure(Automata & automato, std::vector<std::unordered_set<int>> & ec
 
 int main()
 {
+    ///Alterar aqui para utilizar outro arquivo de entrada
     std::string path = "../exemplo4m.txt";
 
+    //Criacao do automato
     Automata automato;
     automato.createFromFile(path);
     int n = automato.getSize();
@@ -49,16 +53,9 @@ int main()
 
     eclosure.clear();
 
+    //Encontro do e-fecho
     findEClosure(automato, eclosure);
 
-//    for(int i=0; i<n; i++)
-//    {
-//        std::cout << "Estado " << i << std::endl;
-//        for(auto itr = eclosure[i].begin(); itr != eclosure[i].end(); itr++)
-//        {
-//            std::cout << *itr << std::endl;
-//        }
-//    }
 
     struct toAdd{
         int depart;
@@ -67,7 +64,7 @@ int main()
     };
 
     std::vector<toAdd> transitionstoAdd;
-    for(int i=0; i<n; i++)
+    for(int i=0; i<n; i++) //Procura de transicoes para serem adicionadas
     {
         if(!eclosure[i].empty())
         {
@@ -80,8 +77,6 @@ int main()
                     {
                         if(itr2->first != ".")
                         {
-                            //std::cout << "Adding " << depart << " " << itr2->first << " " << *itr << std::endl;
-                            //automato.addTransition(depart, itr2->first, (*itr), automato.isFinal(depart));
                             transitionstoAdd.push_back({depart, *itr, itr2->first});
                         }
 
@@ -94,24 +89,22 @@ int main()
                     for(int & nextNode : (itr2->second))
                     {
                         if(itr2->first != ".") {
-                            //std::cout << "Addingi " << i << " " << itr2->first << " " << nextNode << std::endl;
-                            //automato.addTransition(i, itr2->first, nextNode, automato.isFinal(i));
                             transitionstoAdd.push_back({i, nextNode, itr2->first});
                         }
                     }
                 }
-                if(automato.isFinal(*itr))
+                if(automato.isFinal(*itr)) //Configuracao de novos estado finais
                 {
                     automato.setFinal(i);
                 }
                 automato.removeEpsilonTransitions(i);
 
             }
-            //automato.printAutomata();
 
         }
     }
 
+    //Adicao de novas transicoes
     for(toAdd & transitions : transitionstoAdd)
     {
         automato.addTransition(transitions.depart, transitions.key, transitions.arrive, automato.isFinal(transitions.depart));
