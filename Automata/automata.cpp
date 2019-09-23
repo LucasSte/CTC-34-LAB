@@ -1,7 +1,6 @@
 #include "automata.h"
 #include <stack>
-#include <forward_list>
-#include <locale>
+#include <iostream>
 
 Edge::Edge(int index1, int index2, string reg_exprsn) {
     node1 = index1;
@@ -44,27 +43,43 @@ Operation Automata::expr_splitter(string orig_expr) {
     string reg_expr1, reg_expr2;
     char lang_operator;
     int num_open_parentheses = 0;
+    bool there_is_union = false,
+         there_is_cat = false;
 
-    for (int i = 0; i < orig_expr.size(); ++i) {
-        if(num_open_parentheses == 0){
+    for (int i = 0; i < orig_expr.size() && !there_is_union; ++i) {
+        if(num_open_parentheses == 0 && i!=0){
             if(orig_expr[i] == '+'){ // União
                 reg_expr1 = string(orig_expr.begin(), orig_expr.begin()+i);
                 reg_expr2 = string(orig_expr.begin()+i+1, orig_expr.end());
                 lang_operator = '+';
+                there_is_union = true;
             }
-            if(orig_expr[i] == '(' || isalpha(orig_expr[i])){ // Concatenação
+            else if(isalpha(orig_expr[i])){ // Concatenação com um char
                 reg_expr1 = string(orig_expr.begin(), orig_expr.begin()+i);
                 reg_expr2 = string(orig_expr.begin()+i, orig_expr.end());
                 lang_operator = 'c';
+                there_is_cat = true;
             }
-            if(orig_expr[i] == '*'){  // Feixo de Kleene
-                // se chegou até aqui, não há união nem cat, logo os parenteses pegam do início ao fim
-                reg_expr1 = string(orig_expr.begin()+1, orig_expr.end()-2); // tudo menos o parenteses e o '*'
-                lang_operator = '*';
+            else if(orig_expr[i] == '('){ // Concatenação com uma expressão entre parenteses
+                reg_expr1 = string(orig_expr.begin(), orig_expr.begin()+i);
+                reg_expr2 = string(orig_expr.begin()+i+1, orig_expr.end()-1);
+                lang_operator = 'c';
+                there_is_cat = true;
             }
-            else {//error
-                lang_operator = 'x';
+            else if(orig_expr[i] == '*' && !there_is_cat){  // Feixo de Kleene
+                if (isalpha(orig_expr[i-1])){ // a expressão é um único char
+                    reg_expr1 = string(orig_expr.begin(), orig_expr.end()-1);
+                    lang_operator = '*';
+                }
+                else{// a expressão é limitado por parenteses
+                    reg_expr1 = string(orig_expr.begin()+1, orig_expr.end()-2); // não considera os parenreses inicial e final
+                    lang_operator = '*';
+                }
+
             }
+//            else {//error
+//                lang_operator = 'x';
+//            }
         }
 
         if(orig_expr[i]=='('){
@@ -76,6 +91,7 @@ Operation Automata::expr_splitter(string orig_expr) {
 
     }
     Operation answer(reg_expr1, reg_expr2, lang_operator);
+    return  answer;
 }
 
 Automata::Automata(string reg_expr) {
@@ -103,29 +119,44 @@ Automata::Automata(string reg_expr) {
         else if (aux_op.lang_operator == 'c') {// concatenação
             int local_new_node = automata_graph.new_node(false); // cria um novo nó (que ficará entre os dois analisados)
 
-            // add as arestas:
-            automata_graph.add_edge(local_edge_ptr->node1, local_new_node, aux_op.reg_expr1);
-            automata_graph.add_edge(local_new_node, local_edge_ptr->node2, aux_op.reg_expr2);
-
-            // e deleta a anterior:
-            automata_graph.edge_list.erase(local_edge_ptr);
+            // deleta a anterior da pilha:
             remaining_edges.pop();
+
+            // e add as arestas:
+            automata_graph.add_edge(local_edge_ptr->node1, local_new_node, aux_op.reg_expr1);
+            remaining_edges.push(automata_graph.edge_list.begin());
+            automata_graph.add_edge(local_new_node, local_edge_ptr->node2, aux_op.reg_expr2);
+            remaining_edges.push(automata_graph.edge_list.begin());
+
+            // e deleta a anterior do grafo
+            automata_graph.edge_list.erase(local_edge_ptr);
         }
         else if (aux_op.lang_operator == '*'){// feixo de Kleene
             int local_new_node = automata_graph.new_node(false); // cria um novo nó (que ficará entre os dois analisados)
 
+            // deleta a anterior da pilha:
+            remaining_edges.pop();
+
             // add as arestas:
             automata_graph.add_edge(local_edge_ptr->node1, local_new_node, "&");
+            remaining_edges.push(automata_graph.edge_list.begin());
             automata_graph.add_edge(local_new_node, local_edge_ptr->node2, "&");
+            remaining_edges.push(automata_graph.edge_list.begin());
             automata_graph.add_edge(local_new_node, local_new_node, aux_op.reg_expr1);
+            remaining_edges.push(automata_graph.edge_list.begin());
 
-            // e deleta a anterior:
+            // e deleta a anterior do grafo
             automata_graph.edge_list.erase(local_edge_ptr);
-            remaining_edges.pop();
         }
         else
             remaining_edges.pop(); // não há nenhuma operação na expressão da aresta, logo não precisa mais ser reduzida
 
 
+    }
+}
+
+void Automata::show_graph() {
+    for (auto edge : automata_graph.edge_list) {
+        cout<<"("<<edge.node1<<")--- "<<edge.reg_expr<<" ---("<<edge.node2<<")"<<endl;
     }
 }

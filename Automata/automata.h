@@ -44,6 +44,7 @@ public:
     Automata(string reg_expr);
     Operation expr_splitter(string reg_expr); // retorna uma ou duas expressoes regulares e
                                               // a operação que ocorre com/entre elas
+    void show_graph();
 
 };
 
