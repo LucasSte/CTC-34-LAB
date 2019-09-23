@@ -37,15 +37,21 @@ int main()
 
     DecomposeAutomata(automato, automatos);
 
-    std::cout << automatos.size() << std::endl;
+    //std::cout << automatos.size() << std::endl;
 
     std::vector<std::string> regularExpressions;
 
-    for(Automata & compenent : automatos)
+    int size = automato.getSize();
+    for(Automata & component : automatos)
     {
-        compenent.addEpsilionBeginning();
-        compenent.concatenateEdges();
-        compenent.printAutomata();
+        component.addEpsilionBeginning();
+        component.concatenateEdges();
+        for(int i=0; i<size; i++)
+        {
+            component.removeState(1);
+        }
+        component.concatenateEdges();
+        component.printAutomata();
     }
 
 }

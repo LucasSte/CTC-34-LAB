@@ -27,6 +27,7 @@ public:
     void removeFinal(int node);
     void addEpsilionBeginning();
     void concatenateEdges();
+    void removeState(int node);
 
 private:
     struct nodes{

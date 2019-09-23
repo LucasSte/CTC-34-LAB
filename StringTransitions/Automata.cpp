@@ -197,7 +197,17 @@ void Automata::concatenateEdges() {
             int lenght = transitions[j].size();
             for(int k=0; k<lenght; k++)
             {
-                newTransition << transitions[j][k];
+                if(i==j && transitions[j][k] != ".")
+                {
+                    newTransition << "(";
+                    newTransition << transitions[j][k];
+                    newTransition << ")*";
+                }
+                else if(transitions[j][k] != ".")
+                {
+                    newTransition << transitions[j][k];
+                }
+
                 if(k != lenght-1)
                 {
                     newTransition << "+";
@@ -209,11 +219,161 @@ void Automata::concatenateEdges() {
                 states[i].keys[transitions[j][k]].remove(j);
                 states[j].reverse[transitions[j][k]].remove(i);
             }
-            Automata::addTransition(i, newTransition.str(), j, false);
+            Automata::addTransition(i, newTransition.str(), j, states[i].final);
             //states[i].keys[newTransition.str()].push_back(j);
         }
         transitions.clear();
         repeatedTransitions.clear();
 
+    }
+}
+
+
+void Automata::removeState(int node) {
+    bool hasLoopExpression = false;
+    std::string loopExpression;
+
+    if(node==0)
+    {
+        std::cout << "Cannot remove starting node" << std::endl;
+    }
+    else if(states[node].final)
+    {
+        std::cout << "Cannot remove final state" << std::endl;
+    }
+    else {
+        std::ostringstream regex;
+        regex << "(";
+        for (auto itr = states[node].keys.begin(); itr != states[node].keys.end(); itr++) {
+            for (auto it = itr->second.begin(); it != itr->second.end(); it++) {
+                if (*it == node) {
+                    hasLoopExpression = true;
+                    if(itr->first != ".")
+                        regex << itr->first;
+                    if(std::next(it) != itr->second.end())
+                        regex << "+";
+                }
+            }
+        }
+        regex << ")*";
+        loopExpression = regex.str();
+        for (auto itr = states[node].reverse.begin(); itr != states[node].reverse.end(); itr++) {
+            for (int &i : (itr->second)) {
+                for (auto itr2 = states[node].keys.begin(); itr2 != states[node].keys.end(); itr2++) {
+                    for (int &j : (itr2->second)) {
+                        if (hasLoopExpression)
+                        {
+                            if(itr->first == "." && itr2->first == ".")
+                            {
+                                Automata::addTransition(i, loopExpression, j, states[i].final);
+                            }
+                            else if(itr->first == ".")
+                            {
+                                Automata::addTransition(i, loopExpression + itr2->first, j, states[i].final);
+                            }
+                            else if(itr2->first == ".")
+                            {
+                                Automata::addTransition(i, itr->first + loopExpression, j, states[i].final);
+                            }
+                            else
+                            {
+                                Automata::addTransition(i, itr->first + loopExpression + itr2->first, j, states[i].final);
+                            }
+                        }
+                        else
+                        {
+                            if(itr->first == "." && itr2->first == ".")
+                            {
+                                Automata::addTransition(i, "&", j, states[i].final);
+                            }
+                            else if(itr->first == ".")
+                            {
+                                Automata::addTransition(i, itr2->first, j, states[i].final);
+                            }
+                            else if(itr2->first == ".")
+                            {
+                                Automata::addTransition(i, itr->first, j, states[i].final);
+                            }
+                            else
+                            {
+                                Automata::addTransition(i, itr->first + itr2->first, j, states[i].final);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        states[node].keys.clear();
+        states[node].reverse.clear();
+        for (int i = node; i < size-1; i++) {
+            states[i] = states[i + 1];
+        }
+        size--;
+        states.resize(size);
+
+
+        for (nodes &state : states) {
+            std::vector<std::string> keysToDelete;
+            for (auto itr = state.keys.begin(); itr != state.keys.end(); itr++) {
+                for (auto it = itr->second.begin(); it != itr->second.end(); it++) {
+                    if (*it == node) {
+                        itr->second.erase(it);
+                        if(itr->second.empty())
+                        {
+                            keysToDelete.emplace_back(itr->first);
+                        }
+                        break;
+                    }
+                }
+            }
+            for(std::string & key : keysToDelete)
+            {
+                state.keys.erase(key);
+            }
+            keysToDelete.clear();
+            for(auto itr = state.keys.begin(); itr != state.keys.end(); itr++)
+            {
+                for(auto it = itr->second.begin(); it != itr->second.end(); it++)
+                {
+                    if(*it > node)
+                    {
+                        (*it)--;
+                    }
+                }
+            }
+            for(auto itr = state.reverse.begin(); itr != state.reverse.end(); itr++)
+            {
+                for(auto it = itr->second.begin(); it != itr->second.end(); it++)
+                {
+                    if(*it == node)
+                    {
+                        itr->second.erase(it);
+                        if(itr->second.empty())
+                        {
+                            keysToDelete.emplace_back(itr->first);
+                        }
+                        break;
+                    }
+                }
+            }
+            for(std::string & key : keysToDelete)
+            {
+                state.reverse.erase(key);
+            }
+            for(auto itr = state.reverse.begin(); itr != state.reverse.end(); itr++)
+            {
+                for(auto it = itr->second.begin(); it != itr->second.end(); it++)
+                {
+                    if(*it > node)
+                    {
+                        (*it)--;
+                    }
+                }
+            }
+
+
+
+        }
     }
 }
