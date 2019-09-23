@@ -42,7 +42,7 @@ int Graph::new_node(bool is_final) { //retorna o indice do nó
 
 Operation Automata::expr_splitter(string orig_expr) {
     string reg_expr1, reg_expr2;
-    char lang_operator;
+    char lang_operator= 'x';
     int num_open_parentheses = 0;
     bool there_is_union = false,
          there_is_cat = false,
@@ -82,7 +82,7 @@ Operation Automata::expr_splitter(string orig_expr) {
             num_open_parentheses--;
             if(num_open_parentheses == 0 && !first_parentheses_closed){ // se o primeiro parenteses é fechado só agora
                 first_parentheses_closed = true;
-                if(i == orig_expr.size()-1){// e agora é o final da expressão, então ele pode ser removido
+                if(orig_expr[0] == '(' && i == orig_expr.size()-1){// e agora é o final da expressão, então ele pode ser removido
                     reg_expr1 = string(orig_expr.begin()+1, orig_expr.end()-1);
                     lang_operator = 'p'; // remoção de parenteses
                 }
@@ -169,11 +169,11 @@ void Automata::show_graph() {
     }
     cout<<"}"<<endl;
 }
-vector<int> Automata::getNextSates(int node, char letter){ //valores negativos indica que o estado é alcançado por meio de uma transição &
+vector<int> Automata::getNextSates(int node, string str){ //valores negativos indica que o estado é alcançado por meio de uma transição &
     vector<int> next_states;
     for(auto edge : automata_graph.edge_list){
         if(edge.node1 == node){
-            if(edge.reg_expr[0] == letter){
+            if(str.size()!=0 && edge.reg_expr[0] == str[0]){
                 next_states.push_back(edge.node2);
             }
             if(edge.reg_expr[0] == '&'){
@@ -183,29 +183,43 @@ vector<int> Automata::getNextSates(int node, char letter){ //valores negativos i
     }
     return next_states;
 }
-string Automata::states_after_computation(int start_node, string str) {
-    ostringstream output;
+void Automata::states_after_computation(int start_node, string str, vector<bool>* is_after_comp_state) {
 
     if (str.size() == 0){ // o estado atual é o estado de fim da computação
-        if(automata_graph.is_final_node(start_node)){
-            output<<start_node<<" - Final state (String accepted)"<<endl;
-        }
-        else{
-            output<<start_node<<endl;
-        }
+        (*is_after_comp_state)[start_node] = true;
     }
 
-    vector<int> next_states = getNextSates(start_node, str[0]);
+    vector<int> next_states = getNextSates(start_node, str);
     for(auto next_node : next_states){
         string aux;
-        if(next_node > 0){
+        if(next_node > 0){ // foi padronizado no retorno da função getNextSates que retorno negativo é nó alcançado por transição epsilon
             aux = string(str.begin()+1, str.end());
         }
         else{ // o nó é alcançado por meio de uma transição epsilon
             aux = str;
         }
-        output<<states_after_computation(abs(next_node), aux);
+        states_after_computation(abs(next_node), aux, is_after_comp_state);
     }
-    return output.str();
+}
+void Automata::print_states_after_computation(string str) {
+    bool undefined_state= true;
+    vector<bool> is_after_comp_state(automata_graph.num_nodes, false);
+
+    states_after_computation(0, str, &is_after_comp_state);
+
+    for (int i = 0; i < automata_graph.num_nodes; ++i) {
+        if(is_after_comp_state[i]) {
+            if (automata_graph.is_final_node(i)) {
+                cout << i << " - Final state (String accepted)" << endl;
+            } else {
+                cout << i << endl;
+            }
+            undefined_state = false;
+        }
+    }
+    if(undefined_state){
+        cout<<"Undefined State (string not accept)"<<endl;
+    }
 
 }
+

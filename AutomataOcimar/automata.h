@@ -45,8 +45,9 @@ public:
     Operation expr_splitter(string reg_expr); // retorna uma ou duas expressoes regulares e
     // a operação que ocorre com/entre elas
     void show_graph(); // printa o grafo na linguagem dot
-    string states_after_computation(int start_node, string str);
-    vector<int> getNextSates(int node, char letter);
+    void states_after_computation(int start_node, string str, vector<bool>* is_after_comp_state);
+    void print_states_after_computation(string str);
+    vector<int> getNextSates(int node, string str);
 
 };
 
