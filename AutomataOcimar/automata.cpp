@@ -157,17 +157,19 @@ Automata::Automata(string reg_expr) {
     }
 }
 
-void Automata::show_graph() {
-    cout<<"digraph {"<<endl;
+ostringstream Automata::show_graph() {
+    ostringstream output;
+    output<<"digraph {"<<endl;
     for (auto edge : automata_graph.edge_list) {
-        cout<<"\t"<<edge.node1<<" -> "<<edge.node2<<" [label=\""<<edge.reg_expr<<"\"]"<<endl;
+        output<<"\t"<<edge.node1<<" -> "<<edge.node2<<" [label=\""<<edge.reg_expr<<"\"]"<<endl;
     }
     for(int i = 0; i< automata_graph.num_nodes; i++){
         if(automata_graph.is_final_node(i)){
-            cout<<"\t"<<i<<" [peripheries=2]"<<endl;
+            output<<"\t"<<i<<" [peripheries=2]"<<endl;
         }
     }
-    cout<<"}"<<endl;
+    output<<"}"<<endl;
+    return output;
 }
 vector<int> Automata::getNextSates(int node, string str){ //valores negativos indica que o estado é alcançado por meio de uma transição &
     vector<int> next_states;
@@ -201,7 +203,8 @@ void Automata::states_after_computation(int start_node, string str, vector<bool>
         states_after_computation(abs(next_node), aux, is_after_comp_state);
     }
 }
-void Automata::print_states_after_computation(string str) {
+ostringstream Automata::print_states_after_computation(string str) {
+    ostringstream output;
     bool undefined_state= true;
     vector<bool> is_after_comp_state(automata_graph.num_nodes, false);
 
@@ -210,16 +213,16 @@ void Automata::print_states_after_computation(string str) {
     for (int i = 0; i < automata_graph.num_nodes; ++i) {
         if(is_after_comp_state[i]) {
             if (automata_graph.is_final_node(i)) {
-                cout << i << " - Final state (String accepted)" << endl;
+                output << i << " - Final state (String accepted)" << endl;
             } else {
-                cout << i << endl;
+                output << i << endl;
             }
             undefined_state = false;
         }
     }
     if(undefined_state){
-        cout<<"Undefined State (string not accept)"<<endl;
+        output<<"Undefined State (string not accept)"<<endl;
     }
-
+    return  output;
 }
 
