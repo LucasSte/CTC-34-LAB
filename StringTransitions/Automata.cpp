@@ -218,6 +218,16 @@ void Automata::concatenateEdges() {
                 }
                 states[i].keys[transitions[j][k]].remove(j);
                 states[j].reverse[transitions[j][k]].remove(i);
+
+                if(states[i].keys[transitions[j][k]].empty())
+                {
+                    states[i].keys.erase(transitions[j][k]);
+                }
+
+                if(states[j].reverse[transitions[j][k]].empty())
+                {
+                    states[j].reverse.erase(transitions[j][k]);
+                }
             }
             Automata::addTransition(i, newTransition.str(), j, states[i].final);
             //states[i].keys[newTransition.str()].push_back(j);
@@ -375,5 +385,24 @@ void Automata::removeState(int node) {
 
 
         }
+    }
+}
+
+void Automata::getRegularExpression(std::string & answer) {
+    std::ostringstream regex;
+    if(size > 2)
+    {
+        std::cout << "Impossible to get regular expression. Simplify automata first!";
+    }
+    else
+    {
+        for(nodes & node : states)
+        {
+            for(auto itr = node.keys.begin(); itr != node.keys.end(); itr++)
+            {
+                regex << itr->first;
+            }
+        }
+        answer = regex.str();
     }
 }

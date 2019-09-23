@@ -28,6 +28,7 @@ public:
     void addEpsilionBeginning();
     void concatenateEdges();
     void removeState(int node);
+    void getRegularExpression(std::string & answer);
 
 private:
     struct nodes{

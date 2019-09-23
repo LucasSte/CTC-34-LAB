@@ -5,13 +5,13 @@
 #include <string>
 #include <iostream>
 #include <unordered_set>
-#include "AutomataSte/automata.cpp"
-#include "AutomataSte/automata.h"
+#include "StringTransitions/Automata.cpp"
+#include "StringTransitions/Automata.h"
 
 void findEpsilonTrasitions(int insertion_node, int verification_node, Automata & automato, std::vector<std::unordered_set<int>> & eclosure)
 {
-    std::vector<int> * nextNodes;
-    nextNodes = automato.getNextSates(verification_node, '.');
+    std::list<int> * nextNodes;
+    nextNodes = automato.getNextSates(verification_node, ".");
     if(nextNodes != nullptr)
     {
         for(int & j : (*nextNodes))

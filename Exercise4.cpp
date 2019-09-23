@@ -29,7 +29,7 @@ int main()
 {
     Automata automato;
 
-    std::string path = "../teste4.txt";
+    std::string path = "../teste2.txt";
 
     automato.createFromFile(path);
 
@@ -39,19 +39,38 @@ int main()
 
     //std::cout << automatos.size() << std::endl;
 
-    std::vector<std::string> regularExpressions;
+    std::ostringstream regularExpressions;
 
     int size = automato.getSize();
-    for(Automata & component : automatos)
+    int regexqtde = automatos.size();
+    std::string regex;
+    for(int i=0; i<regexqtde; i++)
     {
-        component.addEpsilionBeginning();
-        component.concatenateEdges();
-        for(int i=0; i<size; i++)
+        automatos[i].addEpsilionBeginning();
+        automatos[i].concatenateEdges();
+        int k=1;
+        for(int j=0; j<size-1; j++)
         {
-            component.removeState(1);
+            if(automatos[i].isFinal(k))
+                k++;
+            automatos[i].removeState(k);
         }
-        component.concatenateEdges();
-        component.printAutomata();
+        automatos[i].concatenateEdges();
+        automatos[i].getRegularExpression(regex);
+        regularExpressions << regex;
+        regex.clear();
+        if(i != regexqtde - 1)
+        {
+            regularExpressions << " + ";
+        }
+        //automatos[i].printAutomata();
     }
+
+    regex = regularExpressions.str();
+
+    std::cout << "Expressao regular encontrada:" << std::endl;
+    std::cout << regex << std::endl;
+
+    return 0;
 
 }
