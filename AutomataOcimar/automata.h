@@ -23,7 +23,7 @@ public:
     char lang_operator;
 };
 
-class Graph{ //implementado por lista de arco
+class Graph{ //implementado por lista de arcos
 private:
     vector<bool> final_node;
 public:
@@ -32,6 +32,7 @@ public:
     Graph();
     bool add_edge(int index1, int index2, string reg_expr); // retorna se conseguiu incerir a aresta (não consegue
     // incerir se um dos indices não se refere a um existente)
+
     bool is_final_node(int node_index);
     int new_node(bool is_final); //retorna o indice do nó
 };
@@ -43,7 +44,9 @@ public:
     Automata(string reg_expr);
     Operation expr_splitter(string reg_expr); // retorna uma ou duas expressoes regulares e
     // a operação que ocorre com/entre elas
-    void show_graph();
+    void show_graph(); // printa o grafo na linguagem dot
+    string states_after_computation(int start_node, string str);
+    vector<int> getNextSates(int node, char letter);
 
 };
 
