@@ -1,16 +1,11 @@
 #include <iostream>
-#include "AutomataSte/automata.h"
-#include "AutomataSte/automata.cpp"
+#include "AutomataOcimar/automata.h"
 #include <vector>
 
 int main() {
 
-    Automata automato;
-    automato.createFromFile("../teste.txt");
-
-    std::vector<int> * nodes;
-    nodes = automato.getNextSates(1, '.');
-    //std::cout << (*nodes)[0] << std::endl;
+    Automata my_automata("ab+(b+c)*");
+    my_automata.show_graph();
 
     return 0;
 }
