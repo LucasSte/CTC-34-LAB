@@ -29,7 +29,7 @@ int main()
 {
     Automata automato;
 
-    std::string path = "../exemplo1m.txt";
+    std::string path = "../exemplo2m.txt";
 
     automato.createFromFile(path);
 
@@ -49,20 +49,19 @@ int main()
     {
         automatos[i].addEpsilionBeginning();
         automatos[i].concatenateEdges();
-       // automatos[i].printAutomata();
         int k=1;
         for(int j=0; j<size-1; j++)
         {
-//            std::cout << j << " " << k << std::endl;
             do{
-                k = (k + 1)% size;
+                int new_size = automatos[i].getSize();
+                k = (k + 1)% new_size;
                 if(k==0)
                 {
                     k++;
                 }
             }while(automatos[i].isFinal(k));
             automatos[i].removeState(k);
-            automatos[i].printAutomata();
+   //         automatos[i].printAutomata();
 
         }
         automatos[i].concatenateEdges();
@@ -73,7 +72,6 @@ int main()
         {
             regularExpressions << " + ";
         }
-        //automatos[i].printAutomata();
     }
 
     regex = regularExpressions.str();

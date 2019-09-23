@@ -39,6 +39,7 @@ private:
     std::vector<nodes> states;
     int size;
 
+
 };
 
 

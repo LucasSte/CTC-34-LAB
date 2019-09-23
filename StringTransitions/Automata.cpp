@@ -294,42 +294,29 @@ void Automata::removeState(int node) {
             for (int &i : (itr->second)) {
                 for (auto itr2 = states[node].keys.begin(); itr2 != states[node].keys.end(); itr2++) {
                     for (int &j : (itr2->second)) {
-                        if (hasLoopExpression)
-                        {
-                            if(itr->first == "." && itr2->first == ".")
-                            {
-                                Automata::addTransition(i, loopExpression, j, states[i].final);
-                            }
-                            else if(itr->first == ".")
-                            {
-                                Automata::addTransition(i, loopExpression + itr2->first, j, states[i].final);
-                            }
-                            else if(itr2->first == ".")
-                            {
-                                Automata::addTransition(i, itr->first + loopExpression, j, states[i].final);
-                            }
-                            else
-                            {
-                                Automata::addTransition(i, itr->first + loopExpression + itr2->first, j, states[i].final);
-                            }
-                        }
-                        else
-                        {
-                            if(itr->first == "." && itr2->first == ".")
-                            {
-                                Automata::addTransition(i, "&", j, states[i].final);
-                            }
-                            else if(itr->first == ".")
-                            {
-                                Automata::addTransition(i, itr2->first, j, states[i].final);
-                            }
-                            else if(itr2->first == ".")
-                            {
-                                Automata::addTransition(i, itr->first, j, states[i].final);
-                            }
-                            else
-                            {
-                                Automata::addTransition(i, itr->first + itr2->first, j, states[i].final);
+                        std::pair<int, int> transition(i, j);
+                        if(i!= node && j!= node) {
+                            if (hasLoopExpression) {
+                                if (itr->first == "." && itr2->first == ".") {
+                                    Automata::addTransition(i, loopExpression, j, states[i].final);
+                                } else if (itr->first == ".") {
+                                    Automata::addTransition(i, loopExpression + itr2->first, j, states[i].final);
+                                } else if (itr2->first == ".") {
+                                    Automata::addTransition(i, itr->first + loopExpression, j, states[i].final);
+                                } else {
+                                    Automata::addTransition(i, itr->first + loopExpression + itr2->first, j,
+                                                            states[i].final);
+                                }
+                            } else {
+                                if (itr->first == "." && itr2->first == ".") {
+                                    Automata::addTransition(i, "&", j, states[i].final);
+                                } else if (itr->first == ".") {
+                                    Automata::addTransition(i, itr2->first, j, states[i].final);
+                                } else if (itr2->first == ".") {
+                                    Automata::addTransition(i, itr->first, j, states[i].final);
+                                } else {
+                                    Automata::addTransition(i, itr->first + itr2->first, j, states[i].final);
+                                }
                             }
                         }
                     }
