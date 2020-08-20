@@ -1,4 +1,4 @@
-# CTC-34-LAB
+# Finite Automata Assignment
 
 This is a college programming assignment consisting of three tasks:
 
